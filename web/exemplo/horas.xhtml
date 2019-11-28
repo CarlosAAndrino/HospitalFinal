@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:composition template="/template.xhtml">
+        <ui:define name="body">
+            <p:panel id="CadastroHora" header="Cadastrar Tempo de Estágio" style="width: 95%; margin-right: 30px; margin-top: 30px; margin-left: 30px">
+                <h:panelGrid columns="10"> 
+                    <h:form id="formCadastrol">
+                        <h:panelGrid columns="10" > 
+                            <p:outputLabel value="Estagiário:  " />
+                            <p:selectOneMenu id="comboEstagiario" converter="estagiarioConverter" 
+                                             required="true" requiredMessage="Selecione um Estagiário"  
+                                             value="#{horasEstagiarioControle.horasTotais.estagiario}" style="width: 200px" >
+                                <f:selectItem itemValue="#{null}" itemLabel="Escolha um Estagiário" 
+                                              noSelectionOption="false"/>
+                                <f:selectItems value="#{horasEstagiarioControle.estagiario}" 
+                                               var="cur"
+                                               itemValue="#{cur}"
+                                               itemLabel="#{cur.nome}"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel value="Data: " />
+                            <p:calendar id="data" value="#{horasEstagiarioControle.horasTotais.data}" showOn="button" />
+                            <p:outputLabel value="Horário Entrada: " />
+                            <p:calendar id="entrada" value="#{horasEstagiarioControle.horasTotais.horarioEntrada}" pattern="HH:mm" timeOnly="true" timeZone="GMT" />
+                            <p:outputLabel value="Horário Saída: " />
+                            <p:calendar id="saida" value="#{horasEstagiarioControle.horasTotais.horarioSaida}" pattern="HH:mm" timeOnly="true" timeZone="GMT"/>
+                           
+                            <p:commandButton value="Cadastrar" style=" width: 200px; margin-left: 40px"
+                                             action="#{horasEstagiarioControle.inserir()}"
+                                             update="@form , :formConsulta" />
+                        </h:panelGrid>
+                        <p:messages closable="true" showIcon="false"  />
+                    </h:form>    
+                </h:panelGrid>
+                <p:messages closable="true" showIcon="false"  />
+            </p:panel>
+            
+            <p:panel id="ConsultaHorarios" header="Consultar Horários" style="width: 95%; margin-right: 30px; margin-top: 30px; margin-left: 30px">
+                <h:panelGrid columns="1">
+                    <h:form id="formConsulta" >
+                        <p:dataTable var="horasTotais" value="#{horasEstagiarioControle.lista}"
+                                     tableStyle="width:100%;  min-width: 100%" > 
+                            <p:column headerText="Id">
+                                <h:outputText value="#{horasTotais.id}" />
+                            </p:column>
+                            <p:column headerText="Estagiario">
+                                <h:outputText value="#{horasTotais.estagiario.nome}" />
+                            </p:column>
+                            <p:column headerText="Data" >
+                                <h:outputText value="#{horasTotais.data}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>          
+                            <p:column headerText="Entrada">
+                                <h:outputText value="#{horasTotais.horarioEntrada}">
+                                    <f:convertDateTime pattern="HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Saída">
+                                <h:outputText value="#{horasTotais.horarioSaida}">
+                                    <f:convertDateTime pattern="HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="" style="text-align: center">
+                                <p:commandLink action="#{horasEstagiarioControle.alterar()}" 
+                                               styleClass="link"
+                                               update=":popupAltera" type="button" value="alterar" >
+                                    <f:setPropertyActionListener value="#{horasTotais}" target="#{horasEstagiarioControle.horasTotais}" />
+                                </p:commandLink>
+                            </p:column>
+                            <p:column headerText="" style="text-align: center">
+                                <p:commandLink styleClass="link" value="excluir"
+                                               action="#{horasEstagiarioControle.excluir(horasTotais)}"                                             
+                                               update=":formConsulta" >
+                                    <p:confirm header="Excluir Horário" 
+                                               message="Você tem certeza que deseja excluir este Horário?"
+                                               icon="ui-icon-alert"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>   
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:outputPanel style="width: 100%; text-align:center" layout="block"> 
+                                <p:commandButton value="sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:outputPanel>
+                        </p:confirmDialog> 
+                    </h:form> 
+                </h:panelGrid>
+            </p:panel>
+            
+            <p:dialog closable="false" modal="true" header="Alteração"
+                      id="popupAltera"
+                      visible="#{horasEstagiarioControle.popupAltera}" >
+                <h:form id="formPopupAltera">
+                    <h:panelGrid columns="1">
+                        <h:form id="formCadastrol">
+                            <p:outputLabel value="Estagiário:  " />
+                            <p:selectOneMenu id="comboTutor" converter="estagiarioConverter" 
+                                             required="true" requiredMessage="Selecione um Estagiário"  
+                                             value="#{horasEstagiarioControle.horasTotais.estagiario}" style="width: 200px" >
+                                <f:selectItem itemValue="#{null}" itemLabel="Escolha um Estagiário" 
+                                              noSelectionOption="false"/>
+                                <f:selectItems value="#{horasEstagiarioControle.estagiario}" 
+                                               var="cur"
+                                               itemValue="#{cur}"
+                                               itemLabel="#{cur.nome}"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel value="Data: " />
+                            <p:calendar id="data" value="#{horasEstagiarioControle.horasTotais.data}" showOn="button" />
+                            <p:outputLabel value="Horário Entrada: " />
+                            <p:calendar id="entrada" value="#{horasEstagiarioControle.horasTotais.horarioEntrada}" pattern="HH:mm" timeOnly="true" timeZone="GMT" />
+                            <p:outputLabel value="Horário Saída: " />
+                            <p:calendar id="saida" value="#{horasEstagiarioControle.horasTotais.horarioSaida}" pattern="HH:mm" timeOnly="true" timeZone="GMT" />
+                            <p:messages closable="true" showIcon="false"  />
+                        </h:form>   
+                    </h:panelGrid>
+                    <p/>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:commandButton value="Cancelar" action="#{horasEstagiarioControle.fechaPopupAltera()}" 
+                                         update=":popupAltera" immediate="true" />
+                        <p:commandButton value="Confirmar" action="#{horasEstagiarioControle.alterarHorasEstagiario()}" 
+                                         update=":formConsulta :popupAltera"/>                           
+                    </p:outputPanel>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:messages />
+                    </p:outputPanel>
+                </h:form>
+            </p:dialog>
+            
+            
+            
+        </ui:define>
+    </ui:composition>
+</html>

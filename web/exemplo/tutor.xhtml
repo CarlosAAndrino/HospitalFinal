@@ -1,0 +1,140 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">  
+        <ui:define name="body">
+            <h:form >
+                <h:panelGrid style=" width:100%; text-align: right"  >                 
+                    <p:commandLink styleClass="link" value="menu" action="/menu"  />                                  
+                </h:panelGrid>
+            </h:form>
+            <h:form>
+                <p:commandLink styleClass="link" value="Novo Tutor" 
+                               action="#{tutorControle.abrePopupNovo() }" 
+                               update=":popupNovo" />
+            </h:form> 
+            <p/>
+            <h:form id="formTutor" >
+                <p:dataTable var="tut" value="#{tutorControle.tutores}"
+                             tableStyle="width:auto;  min-width: 100%" > 
+                    <p:column headerText="Id">
+                        <h:outputText value="#{tut.id}" />
+                    </p:column>
+                    <p:column headerText="Nome:">
+                        <h:outputText value="#{tut.nome}" />
+                    </p:column>
+                    <p:column headerText="Cidade:">
+                        <h:outputText value="#{tut.cidade}" />
+                    </p:column>
+                    <p:column headerText="CPF:">
+                        <h:outputText value="#{tut.cpf}" />
+                    </p:column>
+                    <p:column headerText="Telefone:">
+                        <h:outputText value="#{tut.telefone}" />
+                    </p:column> 
+                    <p:column headerText="" style="text-align: center">
+                        <p:commandLink action="#{tutorControle.alterar()}" 
+                                       styleClass="link"
+                                       update=":popupAltera" type="button" value="alterar" >
+                            <f:setPropertyActionListener value="#{tut}" target="#{tutorControle.tut}" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="" style="text-align: center">
+                        <p:commandLink styleClass="link" value="excluir"
+                                       action="#{tutorControle.excluir(tut)}"                                             
+                                       update=":formTutor" >
+                            <p:confirm header="Excluir Tutor" 
+                                       message="Você tem certeza que deseja excluir este tutor?"
+                                       icon="ui-icon-alert"/>
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>   
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:outputPanel style="width: 100%; text-align:center" layout="block"> 
+                        <p:commandButton value="sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:outputPanel>
+                </p:confirmDialog> 
+            </h:form>
+
+
+            <p:dialog closable="false" modal="true" header="Novo tutor" 
+                      id="popupNovo"  visible="#{tutorControle.popupNovo}" >
+                <h:form id="formPopupNovo" >
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Nome "/>
+                        <p:inputText id="campoNome" value="#{tutorControle.tut.nome}" 
+                                     maxlength="30" 
+                                     required="true" requiredMessage="Nome obrigatório" > 
+                            <p:ajax listener="#{tutorControle.converter()}" update="campoNome" />
+                        </p:inputText>
+                        <p:outputLabel value="Cidade "/>
+                        <p:inputText value="#{tutorControle.tut.cidade}" maxlength="30"
+                                     required="true" requiredMessage="Cidade obrigatória"/>
+                        <p:outputLabel value="CPF "/>
+                        <p:inputText value="#{tutorControle.tut.cpf}" maxlength="30"
+                                     required="true" requiredMessage="CPF obrigatório"/>
+                        <p:outputLabel value="Telefone "/>
+                        <p:inputText value="#{tutorControle.tut.telefone}" maxlength="30"
+                                     required="true" requiredMessage="Telefone obrigatória"/> 
+                    </h:panelGrid>
+                    <p/>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:commandButton value="Cancelar" action="#{tutorControle.fecharPopupNovo}" 
+                                         update=":formTutor, :popupNovo" immediate="true" />
+                        <p:commandButton value="Confirmar" action="#{tutorControle.inserir()}" 
+                                         update=":popupNovo, :formTutor"/>                           
+                    </p:outputPanel>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:messages showIcon="false" />
+                    </p:outputPanel>  
+                </h:form>
+            </p:dialog>
+
+
+            <p:dialog closable="false" modal="true" header="Alteração"
+                      id="popupAltera"
+                      visible="#{tutorControle.popupAltera}" >
+                <h:form id="formPopupAltera">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Nome "/>
+                        <p:inputText id="campoNome" value="#{tutorControle.tut.nome}" 
+                                     maxlength="30" > 
+                            <p:ajax listener="#{tutorControle.converter()}" update="campoNome" />
+                        </p:inputText>
+                        <p:outputLabel value="Cidade "/>
+                        <p:inputText id="campoCidade" value="#{tutorControle.tut.cidade}" 
+                                     maxlength="30" > 
+                            <p:ajax listener="#{tutorControle.converter()}" update="campoCidade" />
+                        </p:inputText>
+                        <p:outputLabel value="CPF "/>
+                            <p:inputText id="campoCpf" value="#{tutorControle.tut.cpf}" 
+                                     maxlength="30" > 
+                            <p:ajax listener="#{tutorControle.converter()}" update="campoCpf" />
+                            </p:inputText>
+                            <p:outputLabel value="Telefone "/>
+                        <p:inputText id="campoTelefone" value="#{tutorControle.tut.telefone}" 
+                                     maxlength="30" > 
+                            <p:ajax listener="#{tutorControle.converter()}" update="campoTelefone" />
+                        </p:inputText>
+                        
+                    </h:panelGrid>
+                    <p/>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:commandButton value="Cancelar" action="#{tutorControle.fecharPopupAltera()}" 
+                                         update=":popupAltera" immediate="true" />
+                        <p:commandButton value="Confirmar" action="#{tutorControle.alterarTutor()}" 
+                                         update=":formTutor :popupAltera"/>                           
+                    </p:outputPanel>
+                    <p:outputPanel style="width: 100%; text-align:center" >
+                        <p:messages />
+                    </p:outputPanel>
+                </h:form>
+            </p:dialog>
+
+        </ui:define>
+    </ui:composition>
+</html>
